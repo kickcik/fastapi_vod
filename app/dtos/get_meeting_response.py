@@ -9,7 +9,7 @@ class GetMeetingResponse(BaseModel):
     model_config = FROZEN_CONFIG
 
     url_code: str
-    start_time: date | None = None
-    end_time: date | None = None
+    start_date: date | None = None
+    end_date: date | None = None
     title: str
     location: str

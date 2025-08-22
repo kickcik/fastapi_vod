@@ -10,11 +10,11 @@ MEETING_DATE_MAX_RANGE = timedelta(days=62)
 class UpdateMeetingDataRangeRequest(BaseModel):
     model_config = FROZEN_CONFIG
 
-    strat_date: date
+    start_date: date
     end_date: date
 
     def exceed_max_range(self) -> bool:
-        return self.end_date - self.strat_date > MEETING_DATE_MAX_RANGE
+        return self.end_date - self.start_date > MEETING_DATE_MAX_RANGE  # type: ignore
 
 
 class UpdateMeetingTitleRequest(BaseModel):
