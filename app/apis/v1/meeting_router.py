@@ -98,9 +98,9 @@ async def api_update_meeting_title_mysql(
     status_code=HTTP_204_NO_CONTENT,
 )
 async def api_update_meeting_location_mysql(
-    meeting_url_code: str, update_meeting__location_request: UpdateMeetingLocationRequest
+    meeting_url_code: str, update_meeting_location_request: UpdateMeetingLocationRequest
 ) -> None:
-    updated = await service_update_meeting_location_mysql(meeting_url_code, update_meeting__location_request.location)
+    updated = await service_update_meeting_location_mysql(meeting_url_code, update_meeting_location_request.location)
     if not updated:
         raise HTTPException(
             status_code=HTTP_404_NOT_FOUND, detail=f"meeting with url_code: {meeting_url_code} not found"

@@ -6,6 +6,8 @@ from app.configs import config
 
 TORTOISE_APP_MODELS = [
     "app.tortoise_models.meeting",
+    "app.tortoise_models.participant",
+    "app.tortoise_models.participant_date",
     "aerich.models",
 ]
 
