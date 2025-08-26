@@ -31,3 +31,7 @@ class ParticipantModel(BaseModel, Model):
     @classmethod
     async def create_participant(cls, name: str, meeting_url_code: str) -> ParticipantModel:
         return await cls.create(name=name, meeting_id=meeting_url_code)
+
+    @classmethod
+    async def delete_by_id(cls, participant_id: int) -> int:
+        return await cls.filter(id=participant_id).delete()

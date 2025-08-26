@@ -1,3 +1,4 @@
+import asyncio
 from datetime import date, timedelta
 
 from tortoise.transactions import in_transaction
@@ -24,3 +25,13 @@ async def service_create_participant(
         )
         participant_dates = await ParticipantDateModel.get_all_by_participant_id(participant.id)
     return participant, participant_dates
+
+
+async def service_delete_participant_mysql(
+    participant_id: int,
+) -> int:
+    deleted_participant_count, _ = await asyncio.gather(
+        ParticipantModel.delete_by_id(participant_id),
+        ParticipantDateModel.delete_by_participant_id(participant_id),
+    )
+    return deleted_participant_count

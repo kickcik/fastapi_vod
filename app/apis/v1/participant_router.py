@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from starlette import status
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 
 from app.dtos.create_participant_request import CreateParticipantRequest
@@ -7,7 +8,10 @@ from app.dtos.create_participant_response import (
     ParticipantDateMysql,
 )
 from app.services.meeting_service_mysql import service_get_meeting_mysql
-from app.services.participant_service_mysql import service_create_participant
+from app.services.participant_service_mysql import (
+    service_create_participant,
+    service_delete_participant_mysql,
+)
 
 participant_mysql_router = APIRouter(prefix="/v1/mysql/participants", tags=["Participant"])
 
@@ -40,3 +44,17 @@ async def api_create_participant_mysql(
         participant_id=participant.id,
         participant_dates=[ParticipantDateMysql(id=pd.id, date=pd.date) for pd in participant_dates],
     )
+
+
+@participant_mysql_router.delete(
+    "/{participant_id}", description="participant 를 삭제합니다.", status_code=status.HTTP_204_NO_CONTENT
+)
+async def api_delete_participant_mysql(
+    participant_id: int,
+) -> None:
+    deleted_participant_count = await service_delete_participant_mysql(participant_id)
+    if not deleted_participant_count:
+        raise HTTPException(
+            status_code=HTTP_404_NOT_FOUND,
+            detail=f"participant with id: {participant_id} not found",
+        )

@@ -3,6 +3,7 @@ import datetime
 import httpx
 from starlette.status import (
     HTTP_200_OK,
+    HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
 )
@@ -84,3 +85,50 @@ class TestParticipantRouter(TestCase):
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
         response_body = response.json()
         self.assertEqual(response_body["detail"], "start and end should be set.")
+
+    async def test_delete_participant(self) -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://test",
+        ) as client:
+            # Given
+            meeting_create_response = await client.post("/v1/mysql/meetings")
+            url_code = meeting_create_response.json()["url_code"]
+
+            await client.patch(
+                f"v1/mysql/meetings/{url_code}/date_range",
+                json={"start_date": "2025-10-10", "end_date": "2025-10-12"},
+            )
+
+            participant_create_response = await client.post(
+                "/v1/mysql/participants", json={"meeting_url_code": url_code, "name": "test"}
+            )
+
+            # When
+            response = await client.delete(
+                f"/v1/mysql/participants/{participant_create_response.json()['participant_id']}"
+            )
+
+        # Then
+        self.assertEqual(response.status_code, HTTP_204_NO_CONTENT)
+        participant = await ParticipantModel.filter(
+            id=participant_create_response.json()["participant_id"]
+        ).get_or_none()
+        self.assertIsNone(participant)
+        participant_dates = await ParticipantDateModel.filter(
+            participant_id=participant_create_response.json()["participant_id"]
+        ).all()
+        self.assertEqual(len(participant_dates), 0)
+
+    async def test_delete_participant_does_not_exist(self) -> None:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://test",
+        ) as client:
+            # When
+            response = await client.delete("/v1/mysql/participants/1")
+
+        # Then
+        self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
+        response_body = response.json()
+        self.assertEqual(response_body["detail"], "participant with id: 1 not found")

@@ -48,3 +48,7 @@ class ParticipantDateModel(BaseModel, Model):
     @classmethod
     async def unstar(cls, participant_date_id: int) -> None:
         await cls.filter(id=participant_date_id).update(starred=False)
+
+    @classmethod
+    async def delete_by_participant_id(cls, participant_id: int) -> int:
+        return await cls.filter(participant_id=participant_id).delete()
