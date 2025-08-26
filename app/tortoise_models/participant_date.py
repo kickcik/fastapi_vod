@@ -32,3 +32,19 @@ class ParticipantDateModel(BaseModel, Model):
             .order_by("date")
             .all()
         )
+
+    @classmethod
+    async def on(cls, participant_date_id: int) -> None:
+        await cls.filter(id=participant_date_id).update(enabled=True)
+
+    @classmethod
+    async def off(cls, participant_date_id: int) -> None:
+        await cls.filter(id=participant_date_id).update(enabled=False, starred=False)
+
+    @classmethod
+    async def star(cls, participant_date_id: int) -> None:
+        await cls.filter(id=participant_date_id).update(enabled=True, starred=True)
+
+    @classmethod
+    async def unstar(cls, participant_date_id: int) -> None:
+        await cls.filter(id=participant_date_id).update(starred=False)

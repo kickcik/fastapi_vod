@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from tortoise import Model, fields
 
 from app.tortoise_models.base_model import BaseModel
 from app.tortoise_models.meeting import MeetingModel
+
+if TYPE_CHECKING:
+    from app.tortoise_models.participant_date import ParticipantDateModel
 
 
 class ParticipantModel(BaseModel, Model):
@@ -18,6 +23,7 @@ class ParticipantModel(BaseModel, Model):
         # https://tortoise.github.io/fields.html?h=foreignkey
     )
     meeting_id: str
+    participant_dates: list[ParticipantDateModel]
 
     class Meta:
         table = "participants"

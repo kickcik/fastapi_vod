@@ -6,7 +6,9 @@ from starlette.status import (
 )
 
 from app.dtos.create_meeting_response import CreateMeetingResponse
-from app.dtos.get_meeting_response import GetMeetingResponse
+from app.dtos.get_meeting_response import (
+    GetMeetingResponse,
+)
 from app.dtos.update_meeting_request import (
     MEETING_DATE_MAX_RANGE,
     UpdateMeetingDataRangeRequest,
@@ -32,13 +34,7 @@ async def api_create_meeting_mysql() -> CreateMeetingResponse:
 @mysql_router.get("/{meeting_url_code}", description="meeting을 조회합니다.")
 async def api_get_meeting_mysql(meeting_url_code: str) -> GetMeetingResponse:
     if meeting := await service_get_meeting_mysql(meeting_url_code):
-        return GetMeetingResponse(
-            url_code=meeting.url_code,
-            start_date=meeting.start_date,
-            end_date=meeting.end_date,
-            title=meeting.title,
-            location=meeting.location,
-        )
+        return GetMeetingResponse.from_mysql(meeting)
     else:
         raise HTTPException(status_code=404, detail=f"meeting: {meeting_url_code} not found")
 
@@ -67,13 +63,7 @@ async def api_update_meeting_date_range_mysql(
         meeting_url_code, update_meeting_date_range_request.start_date, update_meeting_date_range_request.end_date
     )
     assert meeting_after_update  # meeting 삭제 기능은 없으므로 meeting_after_update 는 무조건 있습니다.
-    return GetMeetingResponse(
-        url_code=meeting_after_update.url_code,
-        start_date=meeting_after_update.start_date,
-        end_date=meeting_after_update.end_date,
-        title=meeting_after_update.title,
-        location=meeting_after_update.location,
-    )
+    return GetMeetingResponse.from_mysql(meeting_after_update)
 
 
 @mysql_router.patch(
