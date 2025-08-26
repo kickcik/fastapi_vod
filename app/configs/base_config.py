@@ -17,3 +17,5 @@ class Config(BaseSettings):
     MYSQL_PASSWORD: str = "passwd"
     MYSQL_DB: str = "when2meet_vod"
     MYSQL_PORT: int = 3306
+    MYSQL_CONNECT_TIMEOUT: int = 5
+    CONNECTION_POOL_MAX: int = 10
